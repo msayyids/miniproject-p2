@@ -1,0 +1,312 @@
+basePath: /v2
+definitions:
+  controller.ErrorResponse:
+    properties:
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  controller.Response:
+    properties:
+      detail: {}
+      message:
+        type: string
+    type: object
+  model.Bookings:
+    properties:
+      id:
+        type: integer
+      room_id:
+        type: integer
+      status:
+        type: string
+      total_amount:
+        type: integer
+      total_day:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  model.Rooms:
+    properties:
+      availibility:
+        type: boolean
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      type:
+        type: string
+    type: object
+  model.Users:
+    properties:
+      deposit_amount:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone_number:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone_number
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample hotel server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: hotels API
+  version: "1.0"
+paths:
+  /booking:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of user's bookings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Bookings'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user's bookings
+      tags:
+      - Bookings
+    post:
+      consumes:
+      - application/json
+      description: Create a new booking for the user
+      parameters:
+      - description: Booking details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Bookings'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Bookings'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new booking
+      tags:
+      - Bookings
+  /booking/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a booking for the user
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated booking details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Bookings'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Bookings'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a booking
+      tags:
+      - Bookings
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user with email and password
+      parameters:
+      - description: User email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: User password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Login a user
+      tags:
+      - Users
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user in the system
+      parameters:
+      - description: User registration details
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.Users'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Users
+  /rooms:
+    get:
+      consumes:
+      - application/json
+      description: Find available rooms for booking
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Rooms'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Find available rooms
+      tags:
+      - Rooms
+  /topup:
+    put:
+      consumes:
+      - application/json
+      description: Edit user's deposit amount
+      parameters:
+      - description: New deposit amount
+        in: body
+        name: amount
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Edit user's deposit amount
+      tags:
+      - Users
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Get information of the user who is currently logged in
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Users'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get information of the logged-in user
+      tags:
+      - Users
+swagger: "2.0"
