@@ -15,7 +15,7 @@ func (r *Repo) FindBooking(userid int) ([]model.Bookings, error) {
 	return bookings, nil
 }
 
-func (r *Repo) Addboking(userid, roomid, totalDays int, status string) (model.Bookings, error) {
+func (r *Repo) Addboking(userid, roomid, status string) (model.Bookings, error) {
 	tx := r.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -89,7 +89,6 @@ func (r *Repo) EditBooking(bookingid, userid int, status string) (model.Bookings
 		return booking, fmt.Errorf("booking not found")
 	}
 
-	// Update status booking
 	booking.Status = status
 
 	if err := tx.Save(&booking).Error; err != nil {
