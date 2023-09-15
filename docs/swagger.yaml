@@ -138,7 +138,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update a booking for the user
+      description: Update a booking for the user and optionally update room availibility.
       parameters:
       - description: Booking ID
         in: path

@@ -75,7 +75,7 @@ func (r *Repo) Addboking(userid, roomid, totalDays int, status string) (model.Bo
 
 }
 
-func (r *Repo) EditBooking(bookingid, userid int, roomid, totalDays int, status string) (model.Bookings, error) {
+func (r *Repo) EditBooking(bookingid, userid int, status string) (model.Bookings, error) {
 	tx := r.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -89,54 +89,8 @@ func (r *Repo) EditBooking(bookingid, userid int, roomid, totalDays int, status 
 		return booking, fmt.Errorf("booking not found")
 	}
 
-	var user model.Users
-	userID := userid
-
-	if err := tx.Where("id = ?", userID).First(&user).Error; err != nil {
-		tx.Rollback()
-		return booking, fmt.Errorf("user not found")
-	}
-
-	var room model.Rooms
-	if err := tx.Where("id = ?", roomid).First(&room).Error; err != nil {
-		tx.Rollback()
-		return booking, fmt.Errorf("room not found")
-	}
-
-	totalAmount := room.Price * totalDays
-
-	// Kembalikan saldo pengguna
-	user.Deposit_amount += booking.Total_Price
-	if err := tx.Model(&user).Update("deposit_amount", user.Deposit_amount).Error; err != nil {
-		tx.Rollback()
-		return booking, err
-	}
-
-	// Kembalikan status ketersediaan kamar jika sebelumnya tidak tersedia
-	if room.Availibility {
-		if err := tx.Model(&room).Update("availibility", true).Error; err != nil {
-			tx.Rollback()
-			return booking, err
-		}
-	}
-
-	user.Deposit_amount -= totalAmount
-
-	if err := tx.Model(&user).Update("deposit_amount", user.Deposit_amount).Error; err != nil {
-		tx.Rollback()
-		return booking, err
-	}
-
-	if err := tx.Model(&room).Update("availibility", false).Error; err != nil {
-		tx.Rollback()
-		return booking, err
-	}
-
 	// Update status booking
 	booking.Status = status
-	booking.Room_id = roomid
-	booking.Total_day = totalDays
-	booking.Total_Price = totalAmount
 
 	if err := tx.Save(&booking).Error; err != nil {
 		tx.Rollback()

@@ -123,7 +123,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update a booking for the user",
+                "description": "Update a booking for the user and optionally update room availibility.",
                 "consumes": [
                     "application/json"
                 ],

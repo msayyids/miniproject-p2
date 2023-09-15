@@ -47,7 +47,7 @@ func main() {
 	auth := homepage.Use(a.AuthUsers())
 
 	auth.PUT("/topup", c.EditAmount)
-	auth.POST("/user", c.GetLoggedInUserInfo)
+	auth.GET("/user", c.GetLoggedInUserInfo)
 
 	auth.GET("/rooms", c.FindAvailableRoom)
 	auth.GET("/booking", c.GetBooking)

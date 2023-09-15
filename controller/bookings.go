@@ -87,7 +87,7 @@ func (cn *Controllers) CreateBooking(ctx *gin.Context) {
 
 // UpdateBooking godoc
 // @Summary Update a booking
-// @Description Update a booking for the user
+// @Description Update a booking for the user and optionally update room availibility.
 // @Tags Bookings
 // @Accept json
 // @Produce json
@@ -115,19 +115,26 @@ func (cn *Controllers) UpdateBooking(ctx *gin.Context) {
 	}
 
 	var reqbookings model.Bookings
-	reqbookings.Status = "checkin"
 
 	if err := ctx.ShouldBindJSON(&reqbookings); err != nil {
 		ctx.JSON(http.StatusBadRequest, NewErrorResponse(400, "invalid input "+err.Error()))
 		return
 	}
 
-	booking, err := cn.Controller.EditBooking(intId, userlogin, reqbookings.Room_id, reqbookings.Total_day, reqbookings.Status)
+	booking, err := cn.Controller.EditBooking(intId, userlogin, reqbookings.Status)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, NewErrorResponse(400, "booking failed"))
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, NewResponse("201 - success to edit booking", booking))
+	if reqbookings.Status == "checkout" {
 
+		err := cn.Controller.UpdateRoomAvailibility(reqbookings.Room_id, true)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, NewErrorResponse(500, "failed to update room availibility"))
+			return
+		}
+	}
+
+	ctx.JSON(http.StatusCreated, NewResponse("201 - success to edit booking", booking))
 }
